@@ -1,0 +1,9 @@
+---
+- name: Include a role
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: create_user
+      ansible.builtin.include_role:
+        name: ansible_role_create_user
+        tasks_from: main.yml

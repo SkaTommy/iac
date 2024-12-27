@@ -1,0 +1,36 @@
+---
+- name: creating users to server "debian"
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    groups: sudo
+  with_items: "{{ users }}"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  tags: create_user
+
+- name: creating users to server Suse
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    groups: wheel
+  with_items: "{{ users }}"
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RHEL'
+  tags: create_user
+
+- name: creating users to server Suse
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    groups: wheel
+  with_items: "{{ users }}"
+  when: ansible_distribution == 'openSUSE Leap' or ansible_distribution == 'SUSE'
+  tags: create_user
+
+- name: add SSH keys
+  ansible.posix.authorized_key:
+    user: "{{ item.username }}"
+    key: "{{ lookup('file', 'files/{{ item.username }}.pub') }}"
+    state: present
+    # exclusive: yes  # удалить все остальные ключи юзера
+  with_items: "{{ users }}"
+  tags: add_key
